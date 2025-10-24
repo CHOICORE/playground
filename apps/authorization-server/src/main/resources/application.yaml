@@ -1,0 +1,55 @@
+spring.application.name: authorization-server
+spring:
+  data:
+    redis:
+      database: 0
+      repositories:
+        enabled: false
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      client-name: authorization-server
+      client-type: lettuce
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DATASOURCE_URL:localhost:3306}/pms?useSSL=false&serverTimezone=Asia/Seoul
+    username: ${DATASOURCE_USERNAME:choicore}
+    password: ${DATASOURCE_PASSWORD:secret}
+
+  security:
+    user:
+      name: 1
+      password: 1
+      roles: SYSTEM
+
+  thymeleaf:
+    cache: false
+
+  session:
+    redis:
+      namespace: authorization-server
+      repository-type: indexed
+      save-mode: on-set-attribute
+      configure-action: notify_keyspace_events
+      flush-mode: on-save
+
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
+    include-binding-errors: never
+    include-exception: false
+    include-message: never
+    include-path: never
+    include-stacktrace: never
+    path: /error
+  servlet:
+    encoding:
+      enabled: true
+      charset: utf-8
+      force: true
+
+logging:
+  level:
+    org.springframework.security: trace

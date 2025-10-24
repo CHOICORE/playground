@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>로그인</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: #333;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4A90E2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #E74C3C;
+        }
+
+        .error-message {
+            color: #E74C3C;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+
+        .remember-me input[type="checkbox"] {
+            margin-right: 6px;
+        }
+
+        .remember-me label {
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            color: #4A90E2;
+            font-size: 14px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .forgot-password:hover {
+            color: #357ABD;
+            text-decoration: underline;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4A90E2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .submit-button:hover {
+            background-color: #357ABD;
+        }
+
+        .submit-button:active {
+            transform: translateY(1px);
+        }
+
+        .submit-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #ddd;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 16px;
+            color: #666;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .signup-link {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .signup-link a {
+            color: #4A90E2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert.error {
+            background-color: #FEE;
+            color: #C33;
+            border: 1px solid #FCC;
+        }
+
+        .alert.success {
+            background-color: #EFE;
+            color: #3C3;
+            border: 1px solid #CFC;
+        }
+
+        /* 로딩 스피너 */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #4A90E2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <div class="login-header">
+        <h1>로그인</h1>
+        <p>계정에 로그인하세요</p>
+    </div>
+
+    <div class="alert error" id="alertBox"></div>
+
+    <form id="login-form" method="POST" th:action="@{/sign-in}">
+        <div class="form-group">
+            <label class="form-label" for="username">이메일</label>
+            <input
+                    autocomplete="username"
+                    class="form-input"
+                    id="username"
+                    name="username"
+                    placeholder="Username"
+                    required
+                    type="text"
+            >
+            <div class="error-message" id="email-error">유효한 이메일을 입력하세요</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="password">비밀번호</label>
+            <input
+                    autocomplete="current-password"
+                    class="form-input"
+                    id="password"
+                    name="password"
+                    placeholder="Password"
+                    required
+                    type="password"
+            >
+            <div class="error-message" id="password-error">비밀번호를 입력하세요</div>
+        </div>
+
+        <div class="form-options">
+            <div class="remember-me">
+                <input id="remember-me" name="remember-me" type="checkbox">
+                <label for="remember-me">로그인 상태 유지</label>
+            </div>
+            <a class="forgot-password" href="/forgot-password">비밀번호 찾기</a>
+        </div>
+
+        <button class="submit-button" id="submit-button" type="submit">
+            <span id="button-text">로그인</span>
+        </button>
+    </form>
+
+    <div class="divider">
+        <span>또는</span>
+    </div>
+
+    <div class="signup-link">
+        계정이 없으신가요? <a th:href="@{/sign-up}">회원가입</a>
+    </div>
+</div>
+
+<script>
+</script>
+</body>
+</html>
